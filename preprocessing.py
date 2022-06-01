@@ -2,12 +2,12 @@ import pandas as pd
 import numpy as np
 import json
 
-import generes_data
-import productions_data
-import keywords_data
-import cast_data
-import crew_data
-import collections_data
+# import generes_data
+# import productions_data
+# import keywords_data
+# import cast_data
+# import crew_data
+# import collections_data
 
 from itertools import chain
 from collections import Counter
@@ -72,12 +72,12 @@ def to_names_list(sub_df, allowed=None):
 
 
 class Preprocessing:
-    ALLOWED_GENRES = generes_data.data
-    BEST_PRODUCTIONS = productions_data.data
-    KEYWORDS = keywords_data.data
-    KNOWN_CAST = cast_data.data
-    KNOWN_CREW = crew_data.data
-    COLLECTION_COUNT = collections_data.data
+    # ALLOWED_GENRES = generes_data.data
+    # BEST_PRODUCTIONS = productions_data.data
+    # KEYWORDS = keywords_data.data
+    # KNOWN_CAST = cast_data.data
+    # KNOWN_CREW = crew_data.data
+    # COLLECTION_COUNT = collections_data.data
 
     @staticmethod
     def generate_frequent_values(df: pd.DataFrame, col: str, thresh):
@@ -101,25 +101,37 @@ class Preprocessing:
     # ======================================
 
     def __process(self):
-        self.__prepare_belongs_to_collection()  # NEEDS TO BE COMPUTED WITHOUT ALL THE DATA!!
-        self.__prepare_genres()
-        self.__prepare_homepage()
-        self.__prepare_original_language()
-        self.__prepare_production_companies()
-        self.__prepare_date()
-        self.__prepare_keywords()
-        self.__prepare_tagline()
-        self.__prepare_status()
-        self.__prepare_runtime()
-        self.__prepare_crew()
-        self.__prepare_cast()
-
+        self.__process_age()
+        self.__process_basic_stage()
         self.__drop_useless()
+        self.__process_basic_stage()
+        self.__process_diagnosis_date()
+        self.__process_histological_diagnosis()
 
     def __drop_useless(self):
-        self.df.drop(['original_title', 'overview', 'tagline', 'status', 'title', 'original_language',
-                      'cast', 'crew', 'keywords', 'spoken_languages', 'id',
-                      'production_companies', 'production_countries'], axis=1, inplace=True)
+        self.df.drop(['Form Name', 'Hospital', 'User Name', ], axis=1,
+                     inplace=True)
+
+    def __process_age(self):
+        self.df = self.df[self.df['Age'] > 0] # TODO: check the age range
+        self.df = self.df[self.df['Age'] < 110]
+
+    def __process_basic_stage(self):
+        self.df = self.df.dropna(subset=['Basic stage']) # TODO - Check it's ok
+        self.df = pd.get_dummies(self.df, columns=['Basic Stage'],
+                                 drop_first=True)
+
+    def __process_diagnosis_date(self): # TODO - implement
+        pass
+
+    def __process_histological_diagnosis(self): # TODO - implement: parse
+        # the data (values can be composed of different types), then convert
+        # to categorial type
+        pass
+
+
+
+    ###############################  DOR ########################################
 
     def __prepare_status(self):
         self.df['is_released'] = (self.df['status'] == 'Released').astype(int)
@@ -203,5 +215,4 @@ class Preprocessing:
 
 
 if __name__ == '__main__':
-    pre = Preprocessing('train_0.7.csv')
-    # pre.save('./init.csv')
+    pre = Preprocessing('Data and Supplementary Material-20220601/Mission 2 - Breast Cancer/train.feats.csv')
