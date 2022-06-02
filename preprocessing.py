@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import json
 from pandas_profiling import ProfileReport
+<<<<<<< HEAD
 
 # import generes_data
 # import productions_data
@@ -10,17 +11,16 @@ from pandas_profiling import ProfileReport
 # import crew_data
 # import collections_data
 
+=======
+>>>>>>> cd436dcf76f6c48f815b2b3955c80cdd2288316d
 from itertools import chain
 from collections import Counter
-
 from sklearn.preprocessing import MultiLabelBinarizer
 
 import ast
+# TODO :
+# TODO 1 : Figure out what to do with the id column
 
-
-# _------------------------------------------------------
-# ----- HARDCODE any encoding so we can handle well new ones (ignore them)
-# _------------------------------------------------------
 
 def add_missing_encodings(encodings: pd.DataFrame, cols_names: set):
     cols = set(encodings.columns)
@@ -57,8 +57,7 @@ def list_col_name(dataframe, col):
         return np.NAN
 
 
-JSON_COLS = ['belongs_to_collection', 'genres', 'production_companies', 'production_countries',
-             'spoken_languages', 'keywords', 'cast', 'crew']
+JSON_COLS = []
 CONVERTERS = {key: parse_column for key in JSON_COLS}
 
 SEED = 13
@@ -73,6 +72,7 @@ def to_names_list(sub_df, allowed=None):
 
 
 class Preprocessing:
+<<<<<<< HEAD
     # ALLOWED_GENRES = generes_data.data
     # BEST_PRODUCTIONS = productions_data.data
     # KEYWORDS = keywords_data.data
@@ -85,22 +85,90 @@ class Preprocessing:
         vals = df[col].apply(to_names_list)
         v = pd.Series(Counter(chain.from_iterable(vals)))
         return {ind for ind in v.index if (v > thresh)[ind]}
+=======
+>>>>>>> cd436dcf76f6c48f815b2b3955c80cdd2288316d
 
     def __init__(self, src, encoding=None):
         self.df: pd.DataFrame = pd.read_csv(src, converters=CONVERTERS, header=0, encoding=encoding)
         self.__process()
         self.df = self.df.fillna(0)
 
-    def split(self, frac):
+    ############################## Processing ##############################
+
+    def __process(self):
+        # change names with Hebrew letters + drop useless
+        self.__rename()
+        self.__remove_useless()
+
+        # process the columns that stay
+        self.__process_age()
+        self.__process_basic_stage() # Heli
+        self.__process_Her2() # Asif
+        self.__process_histological_diagnosis() # Peleg - done
+        self.__process_histological_degree() # Peleg
+        self.__process_ivi_lymphovascular_invasion()
+        self.__process_KI67_protein()
+        self.__process_meta_mark()
+        self.__process_margin_type()
+        self.__process_side()
+        self.__process_stage()
+        self.__process_surgery_name1()
+        self.__process_surgery_sum()
+        self.__process_tumor_mark()
+        self.__process_tumor_depth()
+        self.__process_er_pr()
+        self.__process_actual_activity()
+
+    def __rename(self):
+        self.df.rename(columns=
+                  {'אבחנה-Age': 'Age',
+                   'אבחנה-Basic stage': 'Basic stage',
+                   'אבחנה-Her2': 'Her2',
+                   'אבחנה-Histological diagnosis': 'Histological diagnosis',
+                   'אבחנה-Histopatological degree': 'Histopatological degree',
+                   'אבחנה-Ivi -Lymphovascular invasion': 'Ivi -Lymphovascular invasion',
+                   'אבחנה-KI67 protein': 'KI67 protein',
+                   'אבחנה-M -metastases mark (TNM)': 'M -metastases mark (TNM)',
+                   'אבחנה-Margin Type': 'Margin Type',
+                   'אבחנה-Side': 'Side',
+                   'אבחנה-Stage': 'Stage',
+                   'אבחנה-Surgery name1': 'Surgery name1',
+                   'אבחנה-Surgery sum': 'Surgery sum',
+                   'אבחנה-T -Tumor mark (TNM)': 'T -Tumor mark (TNM)',
+                   'אבחנה-Tumor depth': 'Tumor depth',
+                   'אבחנה-er': 'er',
+                   'אבחנה-pr': 'pr',
+                   }, inplace=True)
+
+    def __remove_useless(self):
+        self.df.drop(['Form Name', 'Hospital', 'User Name',
+                      'אבחנה-Diagnosis date', 'אבחנה-Lymphatic penetration', 'אבחנה-Lymphatic penetration',
+                      'אבחנה-N -lymph nodes mark (TNM)', 'אבחנה-Nodes exam',
+                      'אבחנה-Positive nodes', 'אבחנה-Surgery date1', 'אבחנה-Surgery date2',
+                      'אבחנה-Surgery date3', 'אבחנה-Surgery name2', 'אבחנה-Surgery name3',
+                      'אבחנה-Tumor width', 'surgery before or after-Activity date',
+                      ''], axis=1,
+                     inplace=True)
+
+    def __process_age(self): # TODO: remove?
+        self.df = self.df[self.df['Age'] > 0]
+        self.df = self.df[self.df['Age'] < 110]
+
+    def __process_basic_stage(self):
+        self.df = self.df.dropna(subset=['Basic stage']) # TODO - Check it's ok
+        self.df = pd.get_dummies(self.df, columns=['Basic Stage'],
+                                 drop_first=True)
+
+    def __process_Her2(self):
         pass
 
-    def save(self, path):
-        self.df.to_csv(path)
+    def __process_histological_diagnosis(self):
+        pass
 
-    # ======================================
-    # ----------- Processing ---------------
-    # ======================================
+    def __process_histological_degree(self):
+        pass
 
+<<<<<<< HEAD
     def __process(self):
         self.__prepare_belongs_to_collection()  # NEEDS TO BE COMPUTED WITHOUT ALL THE DATA!!
         self.__prepare_genres()
@@ -206,6 +274,43 @@ class Preprocessing:
                                      columns=mlb.classes_, index=self.df.index)
         cast_encoding = add_missing_encodings(cast_encoding, Preprocessing.KNOWN_CAST)
         self.df = self.df.join(cast_encoding)
+=======
+    def __process_ivi_lymphovascular_invasion(self):
+        pass
+
+    def __process_KI67_protein(self):
+        pass
+
+    def __process_meta_mark(self):
+        pass
+
+    def __process_margin_type(self):
+        pass
+
+    def __process_side(self):
+        pass
+
+    def __process_stage(self):
+        pass
+
+    def __process_surgery_name1(self):
+        pass
+
+    def __process_surgery_sum(self):
+        pass
+
+    def __process_tumor_mark(self):
+        pass
+
+    def __process_tumor_depth(self):
+        pass
+
+    def __process_er_pr(self):
+        pass
+
+    def __process_actual_activity(self):
+        pass
+>>>>>>> cd436dcf76f6c48f815b2b3955c80cdd2288316d
 
     def __process_pr_er(self):
         def to_pos_neg_val(result: str, test_type: str) -> int:
@@ -218,10 +323,20 @@ class Preprocessing:
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
+=======
+
+    pre = Preprocessing('Data and Supplementary Material-20220601/Mission 2 - Breast Cancer/train.feats.csv')
+
+    # show data with pandas profiling
+>>>>>>> cd436dcf76f6c48f815b2b3955c80cdd2288316d
     src = 'Data and Supplementary Material-20220601/Mission 2 - Breast Cancer/train.feats.csv'
     df = pd.read_csv(src, header=0)
     prof = ProfileReport(df)
     prof.to_file(output_file='output.html')
 
+<<<<<<< HEAD
     # pre = Preprocessing('train_0.7.csv')
     # pre.save('./init.csv')
+=======
+>>>>>>> cd436dcf76f6c48f815b2b3955c80cdd2288316d
