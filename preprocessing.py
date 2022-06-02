@@ -1,13 +1,14 @@
 import pandas as pd
 import numpy as np
 import json
+from pandas_profiling import ProfileReport
 
-import generes_data
-import productions_data
-import keywords_data
-import cast_data
-import crew_data
-import collections_data
+# import generes_data
+# import productions_data
+# import keywords_data
+# import cast_data
+# import crew_data
+# import collections_data
 
 from itertools import chain
 from collections import Counter
@@ -72,12 +73,12 @@ def to_names_list(sub_df, allowed=None):
 
 
 class Preprocessing:
-    ALLOWED_GENRES = generes_data.data
-    BEST_PRODUCTIONS = productions_data.data
-    KEYWORDS = keywords_data.data
-    KNOWN_CAST = cast_data.data
-    KNOWN_CREW = crew_data.data
-    COLLECTION_COUNT = collections_data.data
+    # ALLOWED_GENRES = generes_data.data
+    # BEST_PRODUCTIONS = productions_data.data
+    # KEYWORDS = keywords_data.data
+    # KNOWN_CAST = cast_data.data
+    # KNOWN_CREW = crew_data.data
+    # COLLECTION_COUNT = collections_data.data
 
     @staticmethod
     def generate_frequent_values(df: pd.DataFrame, col: str, thresh):
@@ -106,7 +107,8 @@ class Preprocessing:
         self.__prepare_homepage()
         self.__prepare_original_language()
         self.__prepare_production_companies()
-        self.__prepare_date()
+        self.__process_activity_date()
+        self.__process_pr_er()
         self.__prepare_keywords()
         self.__prepare_tagline()
         self.__prepare_status()
@@ -164,16 +166,20 @@ class Preprocessing:
         productions_encoding = add_missing_encodings(productions_encoding, Preprocessing.BEST_PRODUCTIONS)
         self.df = self.df.join(productions_encoding)
 
-    def __prepare_date(self):
-        release_date = pd.to_datetime(self.df['release_date'], dayfirst=True, errors='coerce')
-        self.df['release_month'] = release_date.dt.month
+    def __process_activity_date(self):
 
-        today = pd.to_datetime('today')
-        weeks_delta = (today - release_date) / np.timedelta64(1, 'W')
-        years_delta = (today - release_date) / np.timedelta64(1, 'Y')
-        self.df['release_very_new'] = (weeks_delta < 2)
-        self.df['release_very_old'] = (years_delta > 50)
-        self.df.drop(['release_date'], axis=1, inplace=True)
+        self.df['activity_date'] = pd.to_datetime(self.df['surgery before or after-Actual activity'],
+                                                  dayfirst=True, errors='coerce')
+
+
+        # self.df['release_month'] = release_date.dt.month
+
+        # today = pd.to_datetime('today')
+        # weeks_delta = (today - release_date) / np.timedelta64(1, 'W')
+        # years_delta = (today - release_date) / np.timedelta64(1, 'Y')
+        # self.df['release_very_new'] = (weeks_delta < 2)
+        # self.df['release_very_old'] = (years_delta > 50)
+        # self.df.drop(['release_date'], axis=1, inplace=True)
 
     def __prepare_homepage(self):
         self.df['homepage'] = (~(self.df['homepage'].isna()) & (self.df['homepage'].str.len() > 0)).astype(int)
@@ -201,7 +207,21 @@ class Preprocessing:
         cast_encoding = add_missing_encodings(cast_encoding, Preprocessing.KNOWN_CAST)
         self.df = self.df.join(cast_encoding)
 
+    def __process_pr_er(self):
+        def to_pos_neg_val(result: str, test_type: str) -> int:
+            """Takes a pr/er result and returns
+             1 - positive or -1 - negative"""
+
+            if 'neg' or
+
+
+
 
 if __name__ == '__main__':
-    pre = Preprocessing('train_0.7.csv')
+    src = 'Data and Supplementary Material-20220601/Mission 2 - Breast Cancer/train.feats.csv'
+    df = pd.read_csv(src, header=0)
+    prof = ProfileReport(df)
+    prof.to_file(output_file='output.html')
+
+    # pre = Preprocessing('train_0.7.csv')
     # pre.save('./init.csv')
