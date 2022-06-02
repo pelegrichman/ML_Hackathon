@@ -1,0 +1,24 @@
+metaestases mark
+basic stage - dummies
+surgery name1
+age
+Her2 : 0,1 = negative,   2 - need to do FISH, if FISH pos=> pos, else=>neg,  3= pos
+Histopatological diagnosis : duct is worse
+Histopatological degree
+Ivi -Lymphovascular invasion
+אבחנה-Margin Type
+אבחנה-N -lymph nodes mark (TNM)
+אבחנה-KI67 protein
+אבחנה-Side
+אבחנה-Stage
+אבחנה-Surgery sum
+אבחנה-T -Tumor mark (TNM)
+אבחנה-Tumor width
+אבחנה-er
+אבחנה-pr
+surgery before or after-Actual activity
+
+////////////
+diagnosis date
+אבחנה-Nodes exam
+אבחנה-Positive nodes
